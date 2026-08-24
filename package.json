@@ -1,0 +1,32 @@
+{
+  "name": "@jjk5245/deddom",
+  "version": "0.0.1",
+  "description": "A tool to analyze and deduplicate component trees.",
+  "license": "ISC",
+  "author": "Justin Kellett",
+  "type": "commonjs",
+  "main": "dedupe.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "bin": {
+    "deddom": "./dedupe.mjs"
+  },
+  "scripts": {
+    "start": "node dedupe.mjs",
+    "demo": "node demo.mjs",
+    "deddom": "node ./node_modules/@jjk5245/deddom/dedupe.mjs"
+  },
+  "dependencies": {
+    "uuid": "^14.0.2",
+    "@babel/parser": "^8.0.4",
+    "@babel/traverse": "^8.0.4"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
