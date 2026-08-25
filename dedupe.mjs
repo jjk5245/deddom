@@ -1,12 +1,13 @@
-#!/usr/bin/env node
 import fs from 'fs';
 import path from 'path';
 import * as parser from '@babel/parser';
-import traverse from "@babel/traverse";
+import traverse from '@babel/traverse';
 import { v4 as uuidv4 } from "uuid";
 
+const evaluate = traverse.default || traverse;
+const currentDir = process.env.INIT_CWD || process.cwd();
 
-const TARGET_DIR = './';
+const TARGET_DIR = currentDir;
 const componentRelationships = {};
 
 // Helper to recursively find JSX files
@@ -26,25 +27,14 @@ function getFiles(dir) {
   return files;
 }
 
-// Extract parent-child component pairings from the code strings
-function analyzeFile(filePath) {
-  const code = fs.readFileSync(filePath, 'utf-8');
-  
-  try {
-    analyzeCode(code);
-  } catch (error) {
-    console.error(`Could not parse file ${filePath}:`, error.message);
-  }
-}
 
 const analyzeCode = (code) => {
-
   const ast = parser.parse(code, { sourceType: 'module', plugins: ['jsx', 'typescript'] });
 
   const nodeMap = new Map();
   const nodes = [];
 
-  traverse(ast, {
+  evaluate(ast, {
     JSXElement(path) {
       const nodeName = path.node.openingElement.name.name;
       if (!nodeMap.has(path.node)) {
@@ -90,20 +80,16 @@ const analyzeCode = (code) => {
     }
   });
 
-  // Recursively prints an ASCII tree structure
   function printAsciiTree(nodesList, prefix = "") {
-    // Sort nodes alphabetically to keep output consistent
     const sortedNodes = [...nodesList].sort((a, b) => a.name.localeCompare(b.name));
 
     sortedNodes.forEach((node, index) => {
       const isLast = index === sortedNodes.length - 1;
       
-      // Choose the right branch pointer
       const pointer = isLast ? "└── " : "├── ";
       
       console.log(`${prefix}${pointer}${node.name}`);
       
-      // Compute the nested indentation prefix for children
       const newPrefix = prefix + (isLast ? "    " : "│   ");
       
       if (node.children && node.children.length > 0) {
@@ -112,17 +98,24 @@ const analyzeCode = (code) => {
     });
   }
 
-  // Print the top-level root
-  console.log("root");
   printAsciiTree(rootNodes);
 }
 
-// Execute analysis
-const allFiles = getFiles(TARGET_DIR);
-// allFiles.forEach(analyzeFile);
-analyzeFile(allFiles[0]); // Analyze the first file for demonstration
+function analyzeFile(filePath) {
+  const code = fs.readFileSync(filePath, 'utf-8');
+  try {
+    console.log(`Analyzing file: ${filePath}`);
+    analyzeCode(code);
+  } catch (error) {
+    console.error(`Could not parse file ${filePath}:`, error.message);
 
-// Convert standard Sets to JSON-friendly Arrays for final output printing
+  }
+}
+
+
+const allFiles = getFiles(TARGET_DIR);
+allFiles.forEach(analyzeFile);
+
 const finalizedTree = {};
 for (const [parent, children] of Object.entries(componentRelationships)) {
   finalizedTree[parent] = Array.from(children);

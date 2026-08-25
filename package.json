@@ -5,7 +5,7 @@
   "license": "ISC",
   "author": "Justin Kellett",
   "type": "commonjs",
-  "main": "dedupe.js",
+  "main": "./dist/dedupe.js",
   "repository": {
     "type": "git",
     "url": "https://github.com"
@@ -14,19 +14,27 @@
     "registry": "https://npm.pkg.github.com"
   },
   "bin": {
-    "deddom": "./dedupe.mjs"
+    "deddom": "./dist/dedupe.js"
   },
+  "files": [
+    "dist",
+    "setup-script.js"
+  ],
   "scripts": {
+    "build": "node build.mjs",
+    "prepublishOnly": "npm run build",
     "start": "node dedupe.mjs",
-    "demo": "node demo.mjs",
-    "deddom": "node ./node_modules/@jjk5245/deddom/dedupe.mjs"
+    "demo": "node demo.mjs"
   },
   "dependencies": {
-    "uuid": "^14.0.2",
     "@babel/parser": "^8.0.4",
-    "@babel/traverse": "^8.0.4"
+    "@babel/traverse": "^8.0.4",
+    "fs": "^0.0.1-security",
+    "uuid": "^14.0.2",
+    "typescript": "^7.0.2"
+
   },
   "devDependencies": {
-    "typescript": "^7.0.2"
+    "esbuild": "^0.28.2"
   }
 }
